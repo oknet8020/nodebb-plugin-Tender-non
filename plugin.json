@@ -1,0 +1,19 @@
+{
+  "id": "nodebb-plugin-Tender-non
+",
+  "name": "Hide Replies for Non-Owner",
+  "description": "Hides all replies in a topic from everyone except topic owner and admins",
+  "url": "https://github.com/YOUR_USERNAME/nodebb-plugin-Tender-non
+",
+  "version": "0.0.1",
+  "main": "library.js",
+  "scripts": {
+    "client": "static/client.js"
+  },
+  "hooks": [
+    {
+      "hook": "filter:post.get",
+      "method": "filterPostGet"
+    }
+  ]
+}
