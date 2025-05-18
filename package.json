@@ -1,0 +1,8 @@
+{
+  "name": "nodebb-plugin-tender-non",
+  "version": "0.0.1",
+  "description": "Hide replies in tender categories from everyone except topic owner and admins.",
+  "main": "library.js",
+  "author": "oknet8020",
+  "license": "MIT"
+}
