@@ -5,7 +5,7 @@ const Privileges = require.main.require('./src/privileges');
 
 const Plugin = {};
 
-// מזהי הקטגוריות שבהן יוחלו ההגבלות
+// מזהי הקטגוריות שבהן תופעל ההסתרה
 const TARGET_CATEGORY_IDS = [69, 70, 71];
 
 Plugin.filterPostGet = async function (hookData) {
@@ -13,38 +13,35 @@ Plugin.filterPostGet = async function (hookData) {
     const post = hookData.post;
     const userId = hookData.uid;
 
-    // אם זה הפוסט הראשי של השרשור – תמיד להציג
     if (!post || !post.tid || post.isMain) {
       return hookData;
     }
 
-    // נשלוף את בעל השרשור והקטגוריה
     const topicData = await Topics.getTopicFields(post.tid, ['uid', 'cid']);
-   
-    if (!TARGET_CATEGORY_IDS.includes(topicData.cid)) {
-  return hookData; // הפוסט לא שייך לקטגוריה – אל תסתיר
-}
-
-
-    // האם המשתמש הנוכחי הוא בעל השרשור?
     const isTopicOwner = userId === topicData.uid;
-
-    // האם המשתמש הוא מנהל (הרשאה גלובלית לניהול משתמשים)?
     const isAdmin = await Privileges.global.can('admin:manage:users', userId);
 
-    // אם הפוסט לא שייך לקטגוריות המוגדרות – לא נעשה כלום
+    const logPrefix = `[Tender-non] פוסט ${post.pid} / נושא ${post.tid}`;
+    console.log(`${logPrefix} → נצפה ע״י UID ${userId}`);
+    console.log(`${logPrefix} → UID של פותח הנושא: ${topicData.uid}`);
+    console.log(`${logPrefix} → CID של הקטגוריה: ${topicData.cid}`);
+    console.log(`${logPrefix} → בודק אם category ${topicData.cid} ב-[${TARGET_CATEGORY_IDS.join(', ')}]`);
+
     if (!TARGET_CATEGORY_IDS.includes(topicData.cid)) {
+      console.log(`${logPrefix} → לא בקטגוריה שמוסתרת`);
       return hookData;
     }
 
-    // הסתרת התגובה אם המשתמש אינו בעל השרשור ואינו מנהל
     if (!isTopicOwner && !isAdmin) {
+      console.log(`${logPrefix} → לא הבעלים ולא מנהל – הסתרה`);
       post.content = '[תגובה מוסתרת]';
+    } else {
+      console.log(`${logPrefix} → צפייה מותרת`);
     }
 
     return hookData;
   } catch (err) {
-    console.error('[Tender-non] שגיאה בסינון תגובות:', err);
+    console.error('[Tender-non] שגיאה בסינון:', err);
     return hookData;
   }
 };
