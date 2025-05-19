@@ -20,6 +20,11 @@ Plugin.filterPostGet = async function (hookData) {
 
     // נשלוף את בעל השרשור והקטגוריה
     const topicData = await Topics.getTopicFields(post.tid, ['uid', 'cid']);
+   
+    if (!TARGET_CATEGORY_IDS.includes(topicData.cid)) {
+  return hookData; // הפוסט לא שייך לקטגוריה – אל תסתיר
+}
+
 
     // האם המשתמש הנוכחי הוא בעל השרשור?
     const isTopicOwner = userId === topicData.uid;
